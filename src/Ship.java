@@ -12,9 +12,9 @@ public class Ship {
 
     private String orientation;
 
-    public Ship(int size, String orientation) {
+    public Ship(int size) {
         this.size = size;
-        this.orientation = orientation;
+        this.orientation = Math.random() > 0.5 ? "v" : "h";
     }
 
     public String getOrientation() {
@@ -25,8 +25,8 @@ public class Ship {
         return size;
     }
 
-    public void setCoordinates(int x, int y) {
-        cellsMap.put(x+":"+y, new ShipCell());
+    public void setCell(int x, int y) {
+        cellsMap.put(x+":"+y, new ShipCell(x, y));
     }
 
     public String drawShip (int x, int y){
@@ -46,6 +46,19 @@ public class Ship {
                shipCell.setState("dead");
            }
        }
+    }
+
+    public Coordinate[][] getSurroundCoordinates() {
+
+        Coordinate[][] coordinates;
+
+        if(orientation.equals("v")) {
+            coordinates = new Coordinate[size+2][2];
+        }
+        else {
+            coordinates = new Coordinate[2][size+2];
+        }
+        return coordinates;
     }
 
 }
