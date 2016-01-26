@@ -1,7 +1,15 @@
+import java.util.HashMap;
+
 public class Ship {
 
-    String symbol = "O";
-    private  int size;
+
+    boolean dead;
+
+    HashMap<String, ShipCell> cellsMap = new HashMap<String, ShipCell>();
+
+    int size;
+    int injuredCells;
+
     private String orientation;
 
     public Ship(int size, String orientation) {
@@ -17,8 +25,27 @@ public class Ship {
         return size;
     }
 
-    public String toString() {
-        return (symbol);
+    public void setCoordinates(int x, int y) {
+        cellsMap.put(x+":"+y, new ShipCell());
+    }
+
+    public String drawShip (int x, int y){
+        return cellsMap.get(x+":"+y).toString();
+    }
+
+    public void gotShot(int x, int y){
+        cellsMap.get(x+":"+y).setState("injured");
+        injuredCells++;
+        checkForDeath();
+    }
+
+    private void checkForDeath () {
+       if (injuredCells == size) {
+           dead = true;
+           for (ShipCell shipCell : cellsMap.values()) {
+               shipCell.setState("dead");
+           }
+       }
     }
 
 }
