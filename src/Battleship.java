@@ -1,19 +1,33 @@
-import java.util.HashMap;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class Battleship {
 
+
+    SortedSet<String> stringset;
 
     public static void main(String[] args) {
 
         Field field = new Field();
 
-        Ship ship = new Ship(4, "v");
+        Ship ship = new Ship(4, "h");
 
         field.setShip(ship, 4, 4);
 
         field.drawField();
 
         ship.getSurroundCoordinates();
+
+//        TreeSet<String> stringset = new TreeSet<String>();
+
+//        for (int i = 0; i < 10; i++){
+//            stringset.add(""+i);
+//        }
+//        System.out.println(stringset.add(""+15));
+//
+//        for (String s : stringset) {
+//            System.out.println(s);
+//        }
 
 
 //        Ship[] ships = {

@@ -1,11 +1,11 @@
-import java.util.Iterator;
+import java.util.LinkedHashSet;
 import java.util.TreeMap;
-import java.util.TreeSet;
+
 
 public class Ship {
 
-    TreeMap<String, ShipCell> cellsMap = new TreeMap<>();
-    TreeSet<Coordinate> surroundCoordinates = new TreeSet<>();
+    TreeMap<String, ShipCell> cellsMap = new TreeMap<>();                   // Набор с ячейками корабля
+    LinkedHashSet<Coordinate> surroundCoordinates = new LinkedHashSet<>();  // Набор с координатами прилегающих ячеек поля
 
     boolean dead;
 
@@ -16,18 +16,21 @@ public class Ship {
 
     private String orientation;
 
+    //Конструктор с рандомной ориентацией
     public Ship(int size) {
         this.size = size;
         this.orientation = Math.random() > 0.5 ? "v" : "h";
         setSizes(size, orientation);
     }
 
+    // Конструктор с задаваемой ориентацией
     public Ship(int size, String orientation) {
         this.size = size;
         this.orientation = orientation;
         setSizes(size, orientation);
     }
 
+    // Определяем размеры корабля по Х и Y
     private void setSizes(int size, String orientation){
         if(orientation.equals("v")){
             this.ySize = 1;
@@ -46,66 +49,47 @@ public class Ship {
         return size;
     }
 
+    // Записываем ячейку корабля в набор
     public void setCell(int x, int y) {
         cellsMap.put(x+":"+y, new ShipCell(x, y));
     }
 
+    // Возвращаем визуализацию ячейки корабля
     public String drawShip (int x, int y){
         return cellsMap.get(x+":"+y).toString();
     }
 
+    // Присваиваем ячейке корабля статус "ранен"
     public void gotShot(int x, int y){
         cellsMap.get(x+":"+y).setState("injured");
         injuredCells++;
         checkForDeath();
     }
 
+    // Проверяем, не "убит" ли корабль
     private void checkForDeath () {
        if (injuredCells == size) {
            dead = true;
            for (ShipCell shipCell : cellsMap.values()) {
-               shipCell.setState("dead");
+               shipCell.setState("dead");                                   // Присваиваем ячейкам корабля статус "убит"
            }
        }
     }
 
-    public void /*Coordinate[][]*/ getSurroundCoordinates() {
-        int headX = cellsMap.get(cellsMap.firstKey()).getX();
-        int headY = cellsMap.get(cellsMap.firstKey()).getY();
+    // Возвращаем набор координат прилегающих к кораблю ячеек поля
+    public LinkedHashSet<Coordinate> getSurroundCoordinates() {
+        int headX = cellsMap.get(cellsMap.firstKey()).getX();       // Получаем координаты "головы" корабля
+        int headY = cellsMap.get(cellsMap.firstKey()).getY();       //
 
-
-       for (int x = headX - 1; x < (xSize+1); x++){
-           for (int y = headY - 1; y < (ySize+1); y++){
-               surroundCoordinates.add(new Coordinate(x,y));
+        for (int x = (headX-1); x <= (headX+xSize); x++){           // Перебираем прилегающие к кораблю координаты
+           for (int y = (headY-1); y <= (headY+ySize); y++){
+               if(!cellsMap.containsKey(x+":"+y)){                  // Исключаем из набора координаты самого корабля
+                   surroundCoordinates.add(new Coordinate(x,y));
+               }
            }
-       }
-
-        Iterator iterator = surroundCoordinates.iterator();
-       while (iterator.hasNext()){
-           System.out.println(iterator.next()+" ");
-       }
-
-
-        /*
-        Coordinate[][] coordinates;
-
-        if(orientation.equals("v")) {
-            coordinates = new Coordinate[size+2][3];
-        }
-        else {
-            coordinates = new Coordinate[3][size+2];
         }
 
-
-        for (int i = 0; i < coordinates.length; i++){
-            System.out.println("");
-            for (int j = 0; j < coordinates[0].length; j++){
-                coordinates[i][j] = new Coordinate(headX, headY);
-                System.out.print(coordinates[i][j].toString()+" ");
-            }
-        }
-        */
-//        return coordinates;
+        return surroundCoordinates;
     }
 
     public void printCoordinates() {
