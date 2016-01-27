@@ -7,7 +7,16 @@ public class Battleship {
 
         Field field = new Field();
 
-        Ship[] ships = {
+        Ship ship = new Ship(4, "v");
+
+        field.setShip(ship, 4, 4);
+
+        field.drawField();
+
+        ship.getSurroundCoordinates();
+
+
+//        Ship[] ships = {
 //                new Ship(4),
 //                new Ship(3),
 //                new Ship(3),
@@ -17,15 +26,14 @@ public class Battleship {
 //                new Ship(1),
 //                new Ship(1),
 //                new Ship(1),
-                new Ship(2)
-        };
-        for (Ship ship : ships) {
-            field.setShipRandom(ship);
-        }
-
-
-        field.drawField();
-
+//                new Ship(2)
+//        };
+//        for (Ship ship : ships) {
+//            field.setShipRandom(ship);
+//        }
+//
+//        field.drawField();
+//
 //        field.shot(0, 0);
 //        field.shot(1, 0);
 //        field.shot(2, 0);
