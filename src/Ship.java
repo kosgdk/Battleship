@@ -5,7 +5,7 @@ public class Ship {
 
     boolean dead;
 
-    HashMap<String, ShipCell> cellsMap = new HashMap<String, ShipCell>();
+    HashMap<String, ShipCell> cellsMap = new HashMap<>();
 
     int size;
     int injuredCells;
@@ -15,6 +15,11 @@ public class Ship {
     public Ship(int size) {
         this.size = size;
         this.orientation = Math.random() > 0.5 ? "v" : "h";
+    }
+
+    public Ship(int size, String orientation) {
+        this.size = size;
+        this.orientation = orientation;
     }
 
     public String getOrientation() {
@@ -59,6 +64,12 @@ public class Ship {
             coordinates = new Coordinate[2][size+2];
         }
         return coordinates;
+    }
+
+    public void printCoordinates() {
+        for (ShipCell shipCell : cellsMap.values()) {
+            System.out.println(shipCell.getX()+":"+shipCell.getY());
+        }
     }
 
 }
