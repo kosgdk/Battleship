@@ -25,6 +25,12 @@ public class Battleship {
 
         field.drawField();
 
+        Computer computer = new Computer(field);
+        for (int i = 0; i < 5; i++) {
+            computer.makeShot();
+        }
+
+
 
     }
 
