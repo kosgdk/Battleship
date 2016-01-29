@@ -20,18 +20,18 @@ public class Ship {
     public Ship(int size) {
         this.size = size;
         this.orientation = Math.random() > 0.5 ? "v" : "h";
-        setSizes(size, orientation);
+        calculateSizes(size, orientation);
     }
 
     // Конструктор с задаваемой ориентацией
     public Ship(int size, String orientation) {
         this.size = size;
         this.orientation = orientation;
-        setSizes(size, orientation);
+        calculateSizes(size, orientation);
     }
 
     // Определяем размеры корабля по Х и Y
-    private void setSizes(int size, String orientation){
+    private void calculateSizes(int size, String orientation){
         if(orientation.equals("v")){
             this.ySize = 1;
             this.xSize = size;
@@ -49,9 +49,12 @@ public class Ship {
         return size;
     }
 
-    // Записываем ячейку корабля в набор
-    public void setCell(int x, int y) {
-        cellsMap.put(x+":"+y, new ShipCell(x, y));
+    public void setCell(Coordinate[] coordinates) {
+        for (Coordinate coordinate : coordinates) {
+            int x = coordinate.getX();
+            int y = coordinate.getY();
+            cellsMap.put(x+":"+y, new ShipCell(x, y));
+        }
     }
 
     // Возвращаем визуализацию ячейки корабля

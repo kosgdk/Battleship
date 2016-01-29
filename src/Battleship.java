@@ -1,25 +1,29 @@
-import java.util.HashMap;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
 public class Battleship {
 
 
 
     public static void main(String[] args) {
 
-        Field field = new Field();
+        Field field = new Field(10, 10);
 
-        Ship ship = new Ship(4, "h");
+        Ship[] ships = new Ship[]{
+            new Ship(4),
+            new Ship(3),
+            new Ship(3),
+            new Ship(2),
+            new Ship(2),
+            new Ship(2),
+            new Ship(1),
+            new Ship(1),
+            new Ship(1),
+            new Ship(1)
+        };
 
-        field.setShip(ship, 1, 1);
+        for (Ship ship : ships) {
+            field.setShipRandom(ship);
+        }
 
         field.drawField();
-
-        field.makeShot(1, 1);
-        field.makeShot(1, 2);
-        field.makeShot(1, 3);
-        field.makeShot(1, 4);
 
 
     }
