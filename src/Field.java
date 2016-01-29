@@ -1,3 +1,4 @@
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import Exceptions.*;
@@ -8,27 +9,36 @@ public class Field {
 
     HashMap<String, ShipAndCoordinate> shipsCoordinates = new HashMap<>();
     HashMap<String, ShipAndCoordinate> shipsEdgesCoordinates = new HashMap<>();
+    HashMap<String, Coordinate> dotsCoordinates = new HashMap<>();
 
     private final String dotCell = " • ";
     private final String emptyCell = " - ";
     
-    private final int FIELDSIZEX;
-    private final int FIELDSIZEY;
+    private final int fieldSizeX;
+    private final int fieldSizeY;
 
-    public Field(int FIELDSIZEX, int FIELDSIZEY) {
-        this.FIELDSIZEX = FIELDSIZEX;
-        this.FIELDSIZEY = FIELDSIZEY;
+    public Field(int fieldSizeX, int fieldSizeY) {
+        this.fieldSizeX = fieldSizeX;
+        this.fieldSizeY = fieldSizeY;
+    }
+
+    public int getFieldSizeX() {
+        return fieldSizeX;
+    }
+
+    public int getFieldSizeY() {
+        return fieldSizeY;
     }
 
     public void setShipRandom(Ship ship) {
 
-        int maxXCoordinate = FIELDSIZEX;
-        int maxYCoordinate = FIELDSIZEY;
+        int maxXCoordinate = fieldSizeX;
+        int maxYCoordinate = fieldSizeY;
 
         if (ship.getOrientation().equals("h")) {    // Ограничиваем возможные координаты поля в зависимости от размера корабля
-            maxYCoordinate = FIELDSIZEY - ship.getSize() + 1;
+            maxYCoordinate = fieldSizeY - ship.getSize() + 1;
         } else {
-            maxXCoordinate = FIELDSIZEX - ship.getSize() + 1;
+            maxXCoordinate = fieldSizeX - ship.getSize() + 1;
         }
 
         try {
@@ -38,7 +48,7 @@ public class Field {
         }
     }
 
-    //Установка корабля на поле.
+    // Установка корабля на поле.
     public void setShip(Ship ship, int x, int y) throws CoordinateIsNotEmptyException{
 
         Coordinate[] coordinates = new Coordinate[ship.getSize()];  // Массив координат корабля
@@ -64,11 +74,10 @@ public class Field {
         }
     }
 
+    // Проверка, свободна ли ячейка поля.
     private boolean checkCoordinates(int x, int y) throws CoordinateIsNotEmptyException{
         if(shipsCoordinates.containsKey(x+":"+y) || shipsEdgesCoordinates.containsKey(x+":"+y) ) {
-//            System.out.println("Exception!");
             throw new CoordinateIsNotEmptyException();
-
         }
         return true;
     }
@@ -76,7 +85,9 @@ public class Field {
     public void makeShot(int x, int y) {
 
         if(shipsCoordinates.containsKey(x+":"+y)){
-            shipsCoordinates.get(x+":"+y).getShip().gotShot(x, y);
+            shipsCoordinates.get(x+":"+y).getShip().gotShot(x, y);  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
+        }else{
+            dotsCoordinates.put(x+":"+y, new Coordinate(x, y));  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
         }
         drawField();
     }
@@ -87,28 +98,28 @@ public class Field {
 
         System.out.print("Y ");
 
-        for (int i = 0; i < FIELDSIZEX; i++) {  // Отрисовываем врхнюю строку с координатами Y
+        for (int i = 0; i < fieldSizeX; i++) {  // Отрисовываем врхнюю строку с координатами Y
             System.out.print(" "+i+" ");
         }
 
         System.out.println("");
         System.out.print("X ");
 
-        for (int i = 0; i < FIELDSIZEX; i++) {  // Отрисовываем горизонтальный разделитель
+        for (int i = 0; i < fieldSizeX; i++) {  // Отрисовываем горизонтальный разделитель
             System.out.print("---");
         }
 
         System.out.println("");
 
-        for (int i = 0; i < FIELDSIZEX; i++) {
+        for (int i = 0; i < fieldSizeX; i++) {
             System.out.print(i+"|");            // Отрисовываем вертикальный разделитель
 
-            for (int j = 0; j < FIELDSIZEY; j++) {
+            for (int j = 0; j < fieldSizeY; j++) {
 
                 if(shipsCoordinates.containsKey(i+":"+j)){
                     System.out.print(" "+ shipsCoordinates.get(i+":"+j).getShip().drawShip(i, j)+" ");  // Если в текущей ячейке поля корабль - рисуем его.
-//                }else if(shipsEdgesCoordinates.containsKey(i+":"+j)){
-//                    System.out.print(dotCell);
+                }else if(dotsCoordinates.containsKey(i+":"+j)){
+                    System.out.print(dotCell);
                 }else{
                     System.out.print(emptyCell);    // Если текущая ячейка поля пуста, рисуем дефолтное представление
                 }
