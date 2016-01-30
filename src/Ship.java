@@ -1,10 +1,8 @@
-import java.util.LinkedHashSet;
-import java.util.TreeMap;
-
+import java.util.HashMap;
 
 public class Ship {
 
-    TreeMap<String, ShipCell> cellsMap = new TreeMap<>();                   // Набор с ячейками корабля
+    HashMap<Coordinate, ShipCell> cellsMap = new HashMap<>();                   // Набор с ячейками корабля
 
     boolean dead;
 
@@ -40,37 +38,27 @@ public class Ship {
         }
     }
 
-    public String getOrientation() {
-        return orientation;
-    }
-
-    public int getSize() {
-        return size;
-    }
-
     public void setCell(Coordinate[] coordinates) {
         for (Coordinate coordinate : coordinates) {
-            int x = coordinate.getX();
-            int y = coordinate.getY();
-            cellsMap.put(x+":"+y, new ShipCell(x, y));
+            cellsMap.put(coordinate, new ShipCell(coordinate.getX(), coordinate.getY()));
         }
     }
 
     // Возвращаем визуализацию ячейки корабля
-    public String drawShip (int x, int y){
-        return cellsMap.get(x+":"+y).toString();
+    public String drawShip (Coordinate coordinate){
+        return cellsMap.get(coordinate).toString();
     }
 
     // Присваиваем ячейке корабля статус "ранен"
-    public void gotShot(int x, int y){
-        cellsMap.get(x+":"+y).setState("injured");
+    public void gotShot(Coordinate coordinate){
+        cellsMap.get(coordinate).setState("injured");
         injuredCells++;
         checkForDeath();
     }
 
     // Проверяем, не "убит" ли корабль
     private void checkForDeath () {
-       if (injuredCells == size) {
+       if (injuredCells == size) {                                          // Если все ячейки корабля подбиты
            dead = true;
            for (ShipCell shipCell : cellsMap.values()) {
                shipCell.setState("dead");                                   // Присваиваем ячейкам корабля статус "убит"
@@ -78,14 +66,16 @@ public class Ship {
        }
     }
 
-    public TreeMap<String, ShipCell> getCoordinates(){
+    public HashMap<Coordinate, ShipCell> getCoordinates(){
         return cellsMap;
     }
 
-    public void printCoordinates() {
-        for (ShipCell shipCell : cellsMap.values()) {
-            System.out.println(shipCell.getX()+":"+shipCell.getY());
-        }
+    public String getOrientation() {
+        return orientation;
+    }
+
+    public int getSize() {
+        return size;
     }
 
     public int getXSize() {
