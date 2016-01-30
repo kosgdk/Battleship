@@ -7,7 +7,6 @@ public class ShipCell {
     final String symbolIdle = "O";
     final String symbolInjured = "x";
     final String symbolDead = "X";
-//    final String symbolShot = ".";
 
     private String state = "idle";
 
@@ -20,18 +19,6 @@ public class ShipCell {
         this.state = state;
     }
 
-    public int getX() {
-        return x;
-    }
-
-    public int getY() {
-        return y;
-    }
-
-    public boolean isInjured () {
-        return state.equals("injured");
-    }
-
     public String toString(){
         switch (state){
             case "injured":
@@ -42,6 +29,5 @@ public class ShipCell {
                 return symbolIdle;
         }
     }
-
 
 }
