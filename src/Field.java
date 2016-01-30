@@ -1,4 +1,3 @@
-import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Random;
 import Exceptions.*;
@@ -7,6 +6,7 @@ public class Field {
 
     Random random = new Random();
 
+    HashMap<String, Coordinate> allCoordinates = new HashMap<>();
     HashMap<String, ShipAndCoordinate> shipsCoordinates = new HashMap<>();
     HashMap<String, ShipAndCoordinate> shipsEdgesCoordinates = new HashMap<>();
     HashMap<String, Coordinate> dotsCoordinates = new HashMap<>();
@@ -20,14 +20,14 @@ public class Field {
     public Field(int fieldSizeX, int fieldSizeY) {
         this.fieldSizeX = fieldSizeX;
         this.fieldSizeY = fieldSizeY;
-    }
 
-    public int getFieldSizeX() {
-        return fieldSizeX;
-    }
+        // Наполняем набор всех возможных координат ячеек поля
+        for (int x = 0; x < fieldSizeX; x++) {
+            for (int y = 0; y < fieldSizeY; y++) {
+                allCoordinates.put(x+":"+y, new Coordinate(x, y));
+            }
 
-    public int getFieldSizeY() {
-        return fieldSizeY;
+        }
     }
 
     public void setShipRandom(Ship ship) {
@@ -56,10 +56,12 @@ public class Field {
         for (int i = 0; i<ship.getSize(); i++) {        // Расчёт координат корабля в зависимости от его ориентации
             if (ship.getOrientation().equals("h")) {
                 checkCoordinates(x, y+i);
-                coordinates[i] = new Coordinate(x, y+i);
+//                coordinates[i] = new Coordinate(x, y+i);
+                coordinates[i] = getCoordinateObject(x, y+i);
             } else {
                 checkCoordinates(x+i, y);
-                coordinates[i] = new Coordinate(x+i, y);
+//                coordinates[i] = new Coordinate(x+i, y);
+                coordinates[i] = getCoordinateObject(x+i, y);
             }
         }
 
@@ -69,9 +71,20 @@ public class Field {
             shipsCoordinates.put(coordinate.getX()+":"+coordinate.getY(), new ShipAndCoordinate(ship, coordinate));     // Записываем координаты корабля в коллекцию
         }
 
-        for (Coordinate coordinate : ship.getSurroundCoordinates()) {
-            shipsEdgesCoordinates.put(coordinate.getX()+":"+coordinate.getY(), new ShipAndCoordinate(ship, coordinate));    // Записываем координаты окружающих ячеек в коллекцию
+        calculateShipEdgesCoordinates(ship, x, y);
+
+    }
+
+    private void calculateShipEdgesCoordinates(Ship ship, int headX, int headY){
+
+        for (int x = (headX-1); x <= (headX+ship.getXSize()); x++){           // Перебираем прилегающие к кораблю координаты
+            for (int y = (headY-1); y <= (headY+ship.getYSize()); y++){
+                if(!ship.getCoordinates().containsKey(x+":"+y)){              // Исключаем из набора координаты самого корабля
+                    shipsEdgesCoordinates.put(x+":"+y, new ShipAndCoordinate(ship, getCoordinateObject(x, y)));
+                }
+            }
         }
+
     }
 
     // Проверка, свободна ли ячейка поля.
@@ -87,7 +100,7 @@ public class Field {
         if(shipsCoordinates.containsKey(x+":"+y)){
             shipsCoordinates.get(x+":"+y).getShip().gotShot(x, y);  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
         }else{
-            dotsCoordinates.put(x+":"+y, new Coordinate(x, y));  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
+            dotsCoordinates.put(x+":"+y, getCoordinateObject(x, y));  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
         }
         drawField();
     }
@@ -128,6 +141,18 @@ public class Field {
         }
     }
 
+    public int getFieldSizeX() {
+        return fieldSizeX;
+    }
+
+    public int getFieldSizeY() {
+        return fieldSizeY;
+    }
+
+    public Coordinate getCoordinateObject(int x, int y){
+        return allCoordinates.get(x+":"+y);
+    }
+
     public void getShipsCoordinates(){
         for (String coordinate : shipsCoordinates.keySet()) {
             System.out.print(coordinate+" ");
@@ -139,6 +164,5 @@ public class Field {
             System.out.print(coordinate+" ");
         }
     }
-
 
 }
