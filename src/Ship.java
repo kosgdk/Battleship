@@ -5,7 +5,6 @@ import java.util.TreeMap;
 public class Ship {
 
     TreeMap<String, ShipCell> cellsMap = new TreeMap<>();                   // Набор с ячейками корабля
-    LinkedHashSet<Coordinate> surroundCoordinates = new LinkedHashSet<>();  // Набор с координатами прилегающих ячеек поля
 
     boolean dead;
 
@@ -79,20 +78,8 @@ public class Ship {
        }
     }
 
-    // Возвращаем набор координат прилегающих к кораблю ячеек поля
-    public LinkedHashSet<Coordinate> getSurroundCoordinates() {
-        int headX = cellsMap.get(cellsMap.firstKey()).getX();       // Получаем координаты "головы" корабля
-        int headY = cellsMap.get(cellsMap.firstKey()).getY();       //
-
-        for (int x = (headX-1); x <= (headX+xSize); x++){           // Перебираем прилегающие к кораблю координаты
-           for (int y = (headY-1); y <= (headY+ySize); y++){
-               if(!cellsMap.containsKey(x+":"+y)){                  // Исключаем из набора координаты самого корабля
-                   surroundCoordinates.add(new Coordinate(x,y));
-               }
-           }
-        }
-
-        return surroundCoordinates;
+    public TreeMap<String, ShipCell> getCoordinates(){
+        return cellsMap;
     }
 
     public void printCoordinates() {
@@ -101,4 +88,11 @@ public class Ship {
         }
     }
 
+    public int getXSize() {
+        return xSize;
+    }
+
+    public int getYSize() {
+        return ySize;
+    }
 }
