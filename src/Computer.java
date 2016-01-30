@@ -15,7 +15,7 @@ public class Computer {
 
         for (int x = 0; x < field.getFieldSizeX(); x++) {
             for (int y = 0; y < field.getFieldSizeY(); y++) {
-                availableCoordinates.add(new Coordinate(x, y));
+                availableCoordinates.add(field.getCoordinateObject(x, y));
             }
         }
     }
