@@ -1,10 +1,10 @@
+
 public class Battleship {
-
-
 
     public static void main(String[] args) {
 
         Field field = new Field(10, 10);
+        GameController gameController = new GameController(field);
 
         Ship[] ships = new Ship[]{
             new Ship(4),
@@ -23,16 +23,14 @@ public class Battleship {
             field.setShipRandom(ship);
         }
 
-        field.drawField();
+       field.drawField();
 
-        Computer computer = new Computer(field);
-        for (int i = 0; i < 5; i++) {
-            computer.makeShot();
-        }
+//        Computer computer = new Computer(field);
+//        for (int i = 0; i < 1; i++) {
+//            computer.makeShot();
+//        }
 
-
+        gameController.playerMove();
 
     }
-
-
 }
