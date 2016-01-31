@@ -1,3 +1,4 @@
+import Exceptions.GameOverEsception;
 
 public class Battleship {
 
@@ -5,6 +6,7 @@ public class Battleship {
 
         Field field = new Field(10, 10);
         GameController gameController = new GameController(field);
+        Computer computer = new Computer(field);
 
         Ship[] ships = new Ship[]{
             new Ship(4),
@@ -23,14 +25,17 @@ public class Battleship {
             field.setShipRandom(ship);
         }
 
-       field.drawField();
+        field.drawField();
 
-//        Computer computer = new Computer(field);
-//        for (int i = 0; i < 1; i++) {
-//            computer.makeShot();
-//        }
+        try{
+            for (int i = 0; i < 100; i++) {
+                computer.makeShot();
+                gameController.checkGameOver();
+            }
+        }catch (GameOverEsception e){
+            System.out.println("Game over");
 
-        gameController.playerMove();
+        }
 
     }
 }
