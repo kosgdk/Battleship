@@ -8,8 +8,8 @@ public class Field {
     Random random = new Random();
 
     HashMap<String, Coordinate> allCoordinates = new HashMap<>();   // Координаты всех ячеек поля
-    HashMap<Coordinate, ShipAndCoordinate> shipsCoordinates = new HashMap<>();  // Координаты всех кораблей
-    HashMap<Coordinate, ShipAndCoordinate> shipsEdgesCoordinates = new HashMap<>(); // Координаты прилегающих к кораблям ячеек
+    HashMap<Coordinate, Ship> shipsCoordinates = new HashMap<>();  // Координаты всех кораблей
+    HashMap<Coordinate, Ship> shipsEdgesCoordinates = new HashMap<>(); // Координаты прилегающих к кораблям ячеек
     HashSet<Coordinate> dotsCoordinates = new HashSet<>();  // Координаты пустых ячеек, в которые стреляли
     HashSet<Ship> ships = new HashSet<>();  // Корабли, установленные на поле
 
@@ -69,7 +69,7 @@ public class Field {
         ships.add(ship);    // Добавляем корабль в коллекцию
 
         for (Coordinate coordinate : coordinates) {
-            shipsCoordinates.put(coordinate, new ShipAndCoordinate(ship, coordinate));     // Записываем координаты корабля в коллекцию
+            shipsCoordinates.put(coordinate, ship);     // Записываем координаты корабля в коллекцию
         }
 
         calculateShipEdgesCoordinates(ship, x, y);
@@ -80,7 +80,7 @@ public class Field {
         for (int x = (headX-1); x <= (headX+ship.getXSize()); x++){           // Перебираем прилегающие к кораблю координаты
             for (int y = (headY-1); y <= (headY+ship.getYSize()); y++){
                 if(!ship.getCoordinates().containsKey(getCoordinateObject(x, y))){              // Исключаем из набора координаты самого корабля
-                    shipsEdgesCoordinates.put(getCoordinateObject(x, y), new ShipAndCoordinate(ship, getCoordinateObject(x, y)));
+                    shipsEdgesCoordinates.put(getCoordinateObject(x, y), ship);
                 }
             }
         }
@@ -98,7 +98,7 @@ public class Field {
     public void makeShot(Coordinate coordinate) {
 
         if(shipsCoordinates.containsKey(coordinate)){
-            shipsCoordinates.get(coordinate).getShip().gotShot(coordinate);  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
+            shipsCoordinates.get(coordinate).gotShot(coordinate);  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
         }else{
             dotsCoordinates.add(coordinate);  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
         }
@@ -130,7 +130,7 @@ public class Field {
             for (int y = 0; y < fieldSizeY; y++) {
 
                 if(shipsCoordinates.containsKey(getCoordinateObject(x, y))){
-                    System.out.print(" "+ shipsCoordinates.get(getCoordinateObject(x, y)).getShip().drawShip(getCoordinateObject(x, y))+" ");  // Если в текущей ячейке поля корабль - рисуем его.
+                    System.out.print(" "+ shipsCoordinates.get(getCoordinateObject(x, y)).drawShip(getCoordinateObject(x, y))+" ");  // Если в текущей ячейке поля корабль - рисуем его.
                 }else if(dotsCoordinates.contains(getCoordinateObject(x, y))){
                     System.out.print(dotCell);
                 }else{
