@@ -26,7 +26,7 @@ public class Computer {
             Coordinate coordinate = availableCoordinates.get(random.nextInt(availableCoordinates.size()));
             System.out.println("Computer shot: " + coordinate);
             availableCoordinates.remove(coordinate);
-            field.makeShot(coordinate.getX(), coordinate.getY());
+            field.makeShot(coordinate);
 
         }else {
             System.out.println("Game over");
