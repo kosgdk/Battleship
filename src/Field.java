@@ -1,17 +1,15 @@
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Random;
+import java.util.*;
 import Exceptions.*;
 
 public class Field {
 
-    Random random = new Random();
+    private Random random = new Random();
 
-    HashMap<String, Coordinate> allCoordinates = new HashMap<>();   // Координаты всех ячеек поля
-    HashMap<Coordinate, Ship> shipsCoordinates = new HashMap<>();  // Координаты всех кораблей
-    HashMap<Coordinate, Ship> shipsEdgesCoordinates = new HashMap<>(); // Координаты прилегающих к кораблям ячеек
-    HashSet<Coordinate> dotsCoordinates = new HashSet<>();  // Координаты пустых ячеек, в которые стреляли
-    HashSet<Ship> ships = new HashSet<>();  // Корабли, установленные на поле
+    private HashMap<String, Coordinate> allCoordinates = new HashMap<>();   // Координаты всех ячеек поля
+    private HashMap<Coordinate, Ship> shipsCoordinates = new HashMap<>();  // Координаты всех кораблей
+    private HashMap<Coordinate, Ship> shipsEdgesCoordinates = new HashMap<>(); // Координаты прилегающих к кораблям ячеек
+    private HashSet<Coordinate> dotsCoordinates = new HashSet<>();  // Координаты пустых ячеек, в которые стреляли
+    private HashSet<Ship> ships = new HashSet<>();  // Корабли, установленные на поле
 
     private final String dotCell = " • ";   // Отображение пустой ячейки, в которую стреляли
     private final String emptyCell = " - "; // Отображение пустой ячейки
@@ -57,11 +55,13 @@ public class Field {
 
         for (int i = 0; i<ship.getSize(); i++) {        // Расчёт координат корабля в зависимости от его ориентации
             if (ship.getOrientation().equals("h")) {
-                checkCoordinates(x, y+i);
-                coordinates[i] = getCoordinateObject(x, y+i);
+                Coordinate coordinate = getCoordinateObject(x, y+i);
+                checkCoordinatesForShipSet(coordinate);
+                coordinates[i] = coordinate;
             } else {
-                checkCoordinates(x+i, y);
-                coordinates[i] = getCoordinateObject(x+i, y);
+                Coordinate coordinate = getCoordinateObject(x+i, y);
+                checkCoordinatesForShipSet(coordinate);
+                coordinates[i] = coordinate;
             }
         }
 
@@ -77,10 +77,11 @@ public class Field {
 
     private void calculateShipEdgesCoordinates(Ship ship, int headX, int headY){
 
-        for (int x = (headX-1); x <= (headX+ship.getXSize()); x++){           // Перебираем прилегающие к кораблю координаты
-            for (int y = (headY-1); y <= (headY+ship.getYSize()); y++){
-                if(!ship.getCoordinates().containsKey(getCoordinateObject(x, y))){              // Исключаем из набора координаты самого корабля
-                    shipsEdgesCoordinates.put(getCoordinateObject(x, y), ship);
+        for (int x = (headX-1); x <= (headX+ship.getXSize()); x++){                 // Перебираем прилегающие к кораблю координаты
+            for (int y = (headY-1); y <= (headY+ship.getYSize()); y++){             //
+                if(!ship.getCoordinates().containsKey(getCoordinateObject(x, y))){  // Исключаем из набора координаты самого корабля
+                    shipsEdgesCoordinates.put(getCoordinateObject(x, y), ship);     // Добавляем прилегающую координату в набор
+                    ship.addEdgesCoordinate(getCoordinateObject(x, y));             // Передаём прилегающую координату кораблю
                 }
             }
         }
@@ -88,26 +89,47 @@ public class Field {
     }
 
     // Проверка, свободна ли ячейка поля.
-    private boolean checkCoordinates(int x, int y) throws CoordinateIsNotEmptyException{
-        if(shipsCoordinates.containsKey(getCoordinateObject(x, y)) || shipsEdgesCoordinates.containsKey(getCoordinateObject(x, y)) ) {
+    public void checkCoordinatesForShipSet(Coordinate coordinate) throws CoordinateIsNotEmptyException{
+        if(shipsCoordinates.containsKey(coordinate) || shipsEdgesCoordinates.containsKey(coordinate)) {
             throw new CoordinateIsNotEmptyException();
         }
-        return true;
     }
 
-    public void makeShot(Coordinate coordinate) {
+    public boolean checkCoordinatesForNextShot(Coordinate coordinate){
+        if(/*shipsEdgesCoordinates.containsKey(coordinate) || */ dotsCoordinates.contains(coordinate)) {
+            return false;
+        }else {
+            return true;
+        }
+    }
 
-        if(shipsCoordinates.containsKey(coordinate)){
-            shipsCoordinates.get(coordinate).gotShot(coordinate);  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
+    public boolean makeShot(Coordinate coordinate) {
+
+        if(shipsCoordinates.containsKey(coordinate)){       // Если набор координат кораблей содержит текущую координату
+            Ship ship = shipsCoordinates.get(coordinate);
+            ship.gotShot(coordinate);                       // делаем выстрел
+            if(ship.isDead()){                              // Если корабль убит
+                System.out.println("Kill!");
+                for(Coordinate edgeCoordinate : ship.getEdgesCoordinates()){    // Помечаем прилегающие координаты точками
+                    dotsCoordinates.add(edgeCoordinate);                        //
+                }
+            }else {
+                System.out.println("Hit!");
+            }
+            drawField();
+            return true;
         }else{
             dotsCoordinates.add(coordinate);  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
+            System.out.println("Miss!");
+            drawField();
+            return false;
         }
-        drawField();
+
     }
 
     public void drawField() {
 
-        System.out.println();
+//        System.out.println();
 
         System.out.print("Y ");
 
@@ -153,6 +175,14 @@ public class Field {
         return allCoordinates.get(x+":"+y);
     }
 
+    public boolean isShipDead(Coordinate coordinate){
+        if (shipsCoordinates.containsKey(coordinate)) {
+            return shipsCoordinates.get(coordinate).isDead();
+        }else {
+            return false;
+        }
+    }
+
     public boolean isAllShipsDead(){
         int deadships = 0;
         for (Ship ship : ships) {
@@ -161,6 +191,12 @@ public class Field {
             }
         }
         return deadships == ships.size();
+    }
+
+    // Возврат набора координат прилегающих ячеек к кораблю, находящемуся в передаваемой координате
+    public HashSet<Coordinate> getShipEdgesCoordinates(Coordinate coordinate){
+        Ship ship = shipsCoordinates.get(coordinate);
+        return ship.getEdgesCoordinates();
     }
 
 }
