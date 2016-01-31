@@ -1,4 +1,8 @@
+import Exceptions.GameOverEsception;
+import Exceptions.InvalidCoordinateFormatException;
 import java.util.Scanner;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class GameController {
 
@@ -11,18 +15,41 @@ public class GameController {
     void playerMove(){
         Scanner scanner = new Scanner(System.in);
         System.out.println("Enter coordinates in format X:Y :");
-        checkInput(scanner.nextLine());
-    }
-
-    void checkInput(String input) {
-
-        if (!input.equals("")) {
-            System.out.println("OK");
-        } else {
-            System.out.println("NO!");
+        try{
+            field.makeShot(getCoordinateFromInput(scanner.nextLine()));
+        }catch (InvalidCoordinateFormatException e){
+            System.out.println("Are you sure you entered a valid coordinates? Try again.");
             playerMove();
         }
+    }
 
+    public Coordinate getCoordinateFromInput(String input) throws InvalidCoordinateFormatException {
+
+        int x, y;
+
+        if (!Pattern.matches(".*\\d+.*\\d+.*", input)) {
+            throw new InvalidCoordinateFormatException();
+        } else {
+            Pattern pattern = Pattern.compile("\\d+");
+            Matcher matcher = pattern.matcher(input);
+
+            matcher.find();
+            x = Integer.parseInt(matcher.group());
+            matcher.find();
+            y = Integer.parseInt(matcher.group());
+
+            if (x > field.getFieldSizeX() || y > field.getFieldSizeY()){
+                throw new InvalidCoordinateFormatException();
+            }
+        }
+        return field.getCoordinateObject(x, y);
+    }
+
+    public void checkGameOver() throws GameOverEsception{
+        if(field.isAllShipsDead()){
+            throw new GameOverEsception();
+        }
     }
 
 }
+
