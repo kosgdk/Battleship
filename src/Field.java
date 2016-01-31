@@ -7,13 +7,14 @@ public class Field {
 
     Random random = new Random();
 
-    HashMap<String, Coordinate> allCoordinates = new HashMap<>();
-    HashMap<Coordinate, ShipAndCoordinate> shipsCoordinates = new HashMap<>();
-    HashMap<Coordinate, ShipAndCoordinate> shipsEdgesCoordinates = new HashMap<>();
-    HashSet<Coordinate> dotsCoordinates = new HashSet<>();
+    HashMap<String, Coordinate> allCoordinates = new HashMap<>();   // Координаты всех ячеек поля
+    HashMap<Coordinate, ShipAndCoordinate> shipsCoordinates = new HashMap<>();  // Координаты всех кораблей
+    HashMap<Coordinate, ShipAndCoordinate> shipsEdgesCoordinates = new HashMap<>(); // Координаты прилегающих к кораблям ячеек
+    HashSet<Coordinate> dotsCoordinates = new HashSet<>();  // Координаты пустых ячеек, в которые стреляли
+    HashSet<Ship> ships = new HashSet<>();  // Корабли, установленные на поле
 
-    private final String dotCell = " • ";
-    private final String emptyCell = " - ";
+    private final String dotCell = " • ";   // Отображение пустой ячейки, в которую стреляли
+    private final String emptyCell = " - "; // Отображение пустой ячейки
     
     private final int fieldSizeX;
     private final int fieldSizeY;
@@ -57,23 +58,21 @@ public class Field {
         for (int i = 0; i<ship.getSize(); i++) {        // Расчёт координат корабля в зависимости от его ориентации
             if (ship.getOrientation().equals("h")) {
                 checkCoordinates(x, y+i);
-//                coordinates[i] = new Coordinate(x, y+i);
                 coordinates[i] = getCoordinateObject(x, y+i);
             } else {
                 checkCoordinates(x+i, y);
-//                coordinates[i] = new Coordinate(x+i, y);
                 coordinates[i] = getCoordinateObject(x+i, y);
             }
         }
 
         ship.setCell(coordinates);  // Передаём кораблю его координаты
+        ships.add(ship);    // Добавляем корабль в коллекцию
 
         for (Coordinate coordinate : coordinates) {
             shipsCoordinates.put(coordinate, new ShipAndCoordinate(ship, coordinate));     // Записываем координаты корабля в коллекцию
         }
 
         calculateShipEdgesCoordinates(ship, x, y);
-
     }
 
     private void calculateShipEdgesCoordinates(Ship ship, int headX, int headY){
@@ -96,12 +95,12 @@ public class Field {
         return true;
     }
 
-    public void makeShot(int x, int y) {
+    public void makeShot(Coordinate coordinate) {
 
-        if(shipsCoordinates.containsKey(getCoordinateObject(x, y))){
-            shipsCoordinates.get(getCoordinateObject(x, y)).getShip().gotShot(getCoordinateObject(x, y));  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
+        if(shipsCoordinates.containsKey(coordinate)){
+            shipsCoordinates.get(coordinate).getShip().gotShot(coordinate);  // Если набор координат кораблей содержит текущую координату - делаем выстрел.
         }else{
-            dotsCoordinates.add(getCoordinateObject(x, y));  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
+            dotsCoordinates.add(coordinate);  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
         }
         drawField();
     }
@@ -154,16 +153,14 @@ public class Field {
         return allCoordinates.get(x+":"+y);
     }
 
-    public void getShipsCoordinates(){
-        for (Coordinate coordinate : shipsCoordinates.keySet()) {
-            System.out.print(coordinate);
+    public boolean isAllShipsDead(){
+        int deadships = 0;
+        for (Ship ship : ships) {
+            if(ship.isDead()){
+                deadships++;
+            }
         }
-    }
-
-    public void getShipsEdgesCoordinates(){
-        for (Coordinate coordinate : shipsEdgesCoordinates.keySet()) {
-            System.out.print(coordinate);
-        }
+        return deadships == ships.size();
     }
 
 }
