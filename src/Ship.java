@@ -85,4 +85,8 @@ public class Ship {
     public int getYSize() {
         return ySize;
     }
+
+    public boolean isDead(){
+        return dead;
+    }
 }
