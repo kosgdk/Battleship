@@ -1,8 +1,10 @@
 import java.util.HashMap;
+import java.util.HashSet;
 
 public class Ship {
 
-    HashMap<Coordinate, ShipCell> cellsMap = new HashMap<>();                   // Набор с ячейками корабля
+    HashMap<Coordinate, ShipCell> cellsMap = new HashMap<>(); // Набор с ячейками корабля
+    HashSet<Coordinate> edgesCoordinates = new HashSet<>();
 
     boolean dead;
 
@@ -88,5 +90,13 @@ public class Ship {
 
     public boolean isDead(){
         return dead;
+    }
+
+    public void addEdgesCoordinate (Coordinate coordinate){
+        edgesCoordinates.add(coordinate);
+    }
+
+    public HashSet<Coordinate> getEdgesCoordinates(){
+        return edgesCoordinates;
     }
 }
