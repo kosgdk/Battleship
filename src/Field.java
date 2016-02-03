@@ -1,5 +1,4 @@
 import java.util.*;
-import Exceptions.*;
 
 public class Field {
 
@@ -30,7 +29,7 @@ public class Field {
         }
     }
 
-    public void setShipRandom(Ship ship) {
+    public void setShip(Ship ship) {
 
         int maxXCoordinate = fieldSizeX;
         int maxYCoordinate = fieldSizeY;
@@ -41,26 +40,29 @@ public class Field {
             maxXCoordinate = fieldSizeX - ship.getSize() + 1;
         }
 
-        try {
-            setShip(ship, random.nextInt(maxXCoordinate), random.nextInt(maxYCoordinate));
-        }catch (CoordinateIsNotEmptyException e){
-            this.setShipRandom(ship);
+
+        if(!setShip(ship, random.nextInt(maxXCoordinate), random.nextInt(maxYCoordinate))){
+            setShip(ship);
         }
     }
 
     // Установка корабля на поле.
-    public void setShip(Ship ship, int x, int y) throws CoordinateIsNotEmptyException{
+    public boolean setShip(Ship ship, int x, int y){
 
         Coordinate[] coordinates = new Coordinate[ship.getSize()];  // Массив координат корабля
 
         for (int i = 0; i<ship.getSize(); i++) {        // Расчёт координат корабля в зависимости от его ориентации
             if (ship.getOrientation().equals("h")) {
                 Coordinate coordinate = getCoordinateObject(x, y+i);
-                checkCoordinatesForShipSet(coordinate);
+                if(shipsCoordinates.containsKey(coordinate) || shipsEdgesCoordinates.containsKey(coordinate)){
+                    return false;
+                }
                 coordinates[i] = coordinate;
             } else {
                 Coordinate coordinate = getCoordinateObject(x+i, y);
-                checkCoordinatesForShipSet(coordinate);
+                if(shipsCoordinates.containsKey(coordinate) || shipsEdgesCoordinates.containsKey(coordinate)){
+                    return false;
+                }
                 coordinates[i] = coordinate;
             }
         }
@@ -73,6 +75,7 @@ public class Field {
         }
 
         calculateShipEdgesCoordinates(ship, x, y);
+        return true;
     }
 
     private void calculateShipEdgesCoordinates(Ship ship, int headX, int headY){
@@ -86,21 +89,6 @@ public class Field {
             }
         }
 
-    }
-
-    // Проверка, свободна ли ячейка поля.
-    public void checkCoordinatesForShipSet(Coordinate coordinate) throws CoordinateIsNotEmptyException{
-        if(shipsCoordinates.containsKey(coordinate) || shipsEdgesCoordinates.containsKey(coordinate)) {
-            throw new CoordinateIsNotEmptyException();
-        }
-    }
-
-    public boolean checkCoordinatesForNextShot(Coordinate coordinate){
-        if(/*shipsEdgesCoordinates.containsKey(coordinate) || */ dotsCoordinates.contains(coordinate)) {
-            return false;
-        }else {
-            return true;
-        }
     }
 
     public boolean makeShot(Coordinate coordinate) {
@@ -171,6 +159,7 @@ public class Field {
         return fieldSizeY;
     }
 
+    // Возвращает объект, инкапсулирующий координаты ячейки.
     public Coordinate getCoordinateObject(int x, int y){
         return allCoordinates.get(x+":"+y);
     }
@@ -193,10 +182,15 @@ public class Field {
         return deadships == ships.size();
     }
 
-    // Возврат набора координат прилегающих ячеек к кораблю, находящемуся в передаваемой координате
+    // Возврат набора координат, прилегающих к кораблю по заданной координате.
     public HashSet<Coordinate> getShipEdgesCoordinates(Coordinate coordinate){
         Ship ship = shipsCoordinates.get(coordinate);
-        return ship.getEdgesCoordinates();
+        if (ship.isDead()) {
+            return ship.getEdgesCoordinates();
+        }else{
+            return null;
+        }
+
     }
 
 }
