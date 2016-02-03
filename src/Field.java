@@ -190,7 +190,14 @@ public class Field {
         }else{
             return null;
         }
+    }
 
+    public String getShipOrientation(Coordinate coordinate){
+        Ship ship = shipsCoordinates.get(coordinate);
+        if(ship.injuredCells > 1){
+            return ship.getOrientation();
+        }
+        return null;
     }
 
 }
