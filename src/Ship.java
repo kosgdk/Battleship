@@ -8,9 +8,9 @@ public class Ship {
 
     boolean dead;
 
-    int size;
-    int xSize;
-    int ySize;
+    private int size;
+    private int xSize;
+    private int ySize;
     int injuredCells;
 
     private String orientation;
@@ -53,9 +53,11 @@ public class Ship {
 
     // Присваиваем ячейке корабля статус "ранен"
     public void gotShot(Coordinate coordinate){
-        cellsMap.get(coordinate).setState("injured");
-        injuredCells++;
-        checkForDeath();
+        if(!isDead()){
+            cellsMap.get(coordinate).setState("injured");
+            injuredCells++;
+            checkForDeath();
+        }
     }
 
     // Проверяем, не "убит" ли корабль
@@ -72,7 +74,7 @@ public class Ship {
         return cellsMap;
     }
 
-    public String getOrientation() {
+    String getOrientation() {
         return orientation;
     }
 
