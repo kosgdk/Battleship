@@ -1,4 +1,4 @@
-import Exceptions.GameOverEsception;
+import Exceptions.GameOverException;
 import Exceptions.InvalidCoordinateFormatException;
 import java.util.Scanner;
 import java.util.regex.Matcher;
@@ -45,9 +45,9 @@ public class GameController {
         return field.getCoordinateObject(x, y);
     }
 
-    public void checkGameOver() throws GameOverEsception{
+    public void checkGameOver() throws GameOverException {
         if(field.isAllShipsDead()){
-            throw new GameOverEsception();
+            throw new GameOverException();
         }
     }
 
