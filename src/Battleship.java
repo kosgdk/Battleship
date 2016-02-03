@@ -1,4 +1,4 @@
-import Exceptions.GameOverEsception;
+import Exceptions.GameOverException;
 
 public class Battleship {
 
@@ -22,7 +22,7 @@ public class Battleship {
         };
 
         for (Ship ship : ships) {
-            field.setShipRandom(ship);
+            field.setShip(ship);
         }
 
         field.drawField();
@@ -32,7 +32,7 @@ public class Battleship {
                 computer.makeShot();
                 gameController.checkGameOver();
             }
-        }catch (GameOverEsception e){
+        }catch (GameOverException e){
             System.out.println("Game over");
 
         }
