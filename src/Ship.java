@@ -46,6 +46,10 @@ public class Ship {
         }
     }
 
+    public boolean isCellIdle(Coordinate coordinate){
+        return cellsMap.get(coordinate).isIdle();
+    }
+
     // Возвращаем визуализацию ячейки корабля
     public String drawShip (Coordinate coordinate){
         return cellsMap.get(coordinate).toString();
