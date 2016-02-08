@@ -19,6 +19,10 @@ public class ShipCell {
         this.state = state;
     }
 
+    public boolean isIdle(){
+        return state.equals("idle");
+    }
+
     public String toString(){
         switch (state){
             case "injured":
