@@ -14,7 +14,7 @@ public class Computer {
     TreeSet<Coordinate> currentShipCoordinates = new TreeSet<>();   // Координаты подбитых ячеек текущего корабля
     ArrayList<Coordinate> possibleCoordinatesForShot = new ArrayList<>();  // Возможные координаты для второго выстрела
 
-    private boolean secondShotStarted, nextShotStarted;
+    private boolean secondShotStarted, secondShotFirstTime, nextShotStarted;
 
     public Computer(Field field) {
         this.field = field;
@@ -26,15 +26,19 @@ public class Computer {
     }
 
     public void makeShot(){
-
-        if(secondShotStarted){
+        if(!secondShotStarted & !nextShotStarted){
+            firstShot();
+        }else if(secondShotStarted){
             secondShot(lastCoordinate);
         }else if(nextShotStarted){
             nextShot(lastCoordinate);
         }
+    }
+
+    private void firstShot(){
+        System.out.println("First shot");
 
         currentShipCoordinates.clear();
-        System.out.println("PC size" + possibleCoordinatesForShot.size());
 
         Coordinate coordinate = availableCoordinates.get(random.nextInt(availableCoordinates.size())); // Выбираем случайную координату из доступных
 
@@ -46,18 +50,20 @@ public class Computer {
 
         if (shotResult & !field.isShipDead(coordinate)){    // Если выстрел удачный и корабль ещё не убит
             currentShipCoordinates.add(coordinate); // Добавляем текущую координату в набор координат текущего корабля
-            secondShot(coordinate);
+            secondShotStarted = true;
+            secondShotFirstTime = true;
+            lastCoordinate = coordinate;
+//            secondShot(coordinate);
         }else if (shotResult & field.isShipDead(coordinate)){   // Если выстрел удачный и корабль убит
             removeShipEdgesCoordinatesFromAvailableCoordinates(coordinate);
         }
-
     }
 
     private void secondShot(Coordinate coordinate){
         System.out.println("Second shot!"); /**DEBUG*/
 
-        if (!secondShotStarted){
-            secondShotStarted = true;
+        if (secondShotFirstTime){
+            secondShotFirstTime = false;
             possibleCoordinatesForShot.clear();
             int x = coordinate.getX();
             int y = coordinate.getY();
@@ -66,9 +72,9 @@ public class Computer {
             possibleCoordinatesForShot.add(field.getCoordinateObject(x, y-1)); //
             possibleCoordinatesForShot.add(field.getCoordinateObject(x, y+1)); //
             checkPossibleCoordinates(possibleCoordinatesForShot);
-            if(possibleCoordinatesForShot.size() == 0){
-                makeShot();
-            }
+//            if(possibleCoordinatesForShot.size() == 0){
+//                makeShot();
+//            }
         }
 
         System.out.println("secondShotStarted = " + secondShotStarted); /**DEBUG*/
@@ -87,19 +93,22 @@ public class Computer {
             secondShotStarted = false;
             possibleCoordinatesForShot.clear();
         }else if(shotResult & !field.isShipDead(randomPossibleCoordinate)){ // Еслм выстрел удачный и корабль ещё жив
+            System.out.println("Hit + alive!");
             currentShipCoordinates.add(randomPossibleCoordinate);
-            nextShot(randomPossibleCoordinate);
-        }else if(!shotResult){                                              // Если промах
             lastCoordinate = coordinate;
-            secondShot(coordinate);
+            secondShotStarted = false;
+            nextShotStarted = true;
+//            nextShot(randomPossibleCoordinate);
+        }else if(!shotResult){                                              // Если промах
+            System.out.println("Miss + alive!");
+            lastCoordinate = coordinate;
+//            secondShot(coordinate);
         }
 
     }
 
     private void nextShot(Coordinate coordinate){
         lastCoordinate = null;
-        secondShotStarted = false;
-        nextShotStarted = true;
         System.out.println("Next shot!"); /**DEBUG*/
         possibleCoordinatesForShot.clear();
         String shipOrientation = field.getShipOrientation(coordinate);
@@ -125,9 +134,11 @@ public class Computer {
             possibleCoordinatesForShot.clear();
         }else if(shotResult & !field.isShipDead(randomPossibleCoordinate)){     // Еслм выстрел удачный и корабль ещё жив
             currentShipCoordinates.add(randomPossibleCoordinate);
-            nextShot(randomPossibleCoordinate);
+            lastCoordinate = randomPossibleCoordinate;
+//            nextShot(randomPossibleCoordinate);
         }else if (!shotResult){                                                 // Если промах
-            nextShot(coordinate);
+            lastCoordinate = coordinate;
+//            nextShot(coordinate);
         }
     }
 
