@@ -16,9 +16,12 @@ public class Field {
     private final int fieldSizeX;
     private final int fieldSizeY;
 
-    public Field(int fieldSizeX, int fieldSizeY) {
+    boolean computerFieldType;  // true - computer field, false - player field
+
+    public Field(int fieldSizeX, int fieldSizeY, boolean computerFieldType) {
         this.fieldSizeX = fieldSizeX;
         this.fieldSizeY = fieldSizeY;
+        this.computerFieldType = computerFieldType;
 
         // Наполняем набор всех возможных координат ячеек поля
         for (int x = 0; x < fieldSizeX; x++) {
@@ -139,12 +142,20 @@ public class Field {
 
             for (int y = 0; y < fieldSizeY; y++) {
 
-                if(shipsCoordinates.containsKey(getCoordinateObject(x, y))){
-                    System.out.print(" "+ shipsCoordinates.get(getCoordinateObject(x, y)).drawShip(getCoordinateObject(x, y))+" ");  // Если в текущей ячейке поля корабль - рисуем его.
-                }else if(dotsCoordinates.contains(getCoordinateObject(x, y))){
+                if(shipsCoordinates.containsKey(getCoordinateObject(x, y))){    // Если в текущей ячейке поля корабль
+                    if (computerFieldType){                                     // Если тип поля - поле компьютера
+                        if (shipsCoordinates.get(getCoordinateObject(x, y)).isCellIdle(getCoordinateObject(x, y))){                         // Если ячейка корабля не подбита - рисуем пустую ячейку поля
+                            System.out.print(emptyCell);
+                        }else {
+                            System.out.print(" "+ shipsCoordinates.get(getCoordinateObject(x, y)).drawShip(getCoordinateObject(x, y))+" "); // Если ячейка корабля подбита или мертва - рисуем корабль
+                        }
+                    }else {                                                     // Если тип поля - поле игрока
+                        System.out.print(" "+ shipsCoordinates.get(getCoordinateObject(x, y)).drawShip(getCoordinateObject(x, y))+" ");     // Рисуем корабль
+                    }
+                }else if(dotsCoordinates.contains(getCoordinateObject(x, y))){  // Если в текущe. ячейку уже стреляли - рисуем точку
                     System.out.print(dotCell);
-                }else{
-                    System.out.print(emptyCell);    // Если текущая ячейка поля пуста, рисуем дефолтное представление
+                }else{                                                          // Если текущая ячейка поля пуста, рисуем пустую ячейку поля
+                    System.out.print(emptyCell);
                 }
             }
             System.out.println();
