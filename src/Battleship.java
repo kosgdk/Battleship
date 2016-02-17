@@ -1,16 +1,26 @@
-import Exceptions.GameOverException;
-
 import java.util.Scanner;
 
 public class Battleship {
 
     public static void main(String[] args) {
 
-        Field field = new Field(10, 10, true);
-        GameController gameController = new GameController(field);
-        Computer computer = new Computer(field);
+        Field computerField = new Field(10, 10, true);
+        Field playerField = new Field(10, 10, false);
+        Computer computer = new Computer(playerField);
 
-        Ship[] ships = new Ship[]{
+        Ship[] computerShips = new Ship[]{
+            new Ship(4),
+            new Ship(3),
+            new Ship(3),
+            new Ship(2),
+            new Ship(2),
+            new Ship(2),
+            new Ship(1),
+            new Ship(1),
+            new Ship(1),
+            new Ship(1)
+        };
+        Ship[] playerShips = new Ship[]{
             new Ship(4),
             new Ship(3),
             new Ship(3),
@@ -23,25 +33,16 @@ public class Battleship {
             new Ship(1)
         };
 
-        for (Ship ship : ships) {
-            field.setShip(ship);
+        for (Ship ship : computerShips) {
+            computerField.setShip(ship);
+        }
+        for (Ship ship : playerShips) {
+            playerField.setShip(ship);
         }
 
-        field.drawField();
+        GameController gameController = new GameController(playerField, computerField, computer);
 
-        Scanner scanner = new Scanner(System.in);
-
-        String test = "";
-
-        for (int i = 0; i < 100; i++) {
-            computer.makeShot();
-//            test = scanner.nextLine();
-            if (gameController.checkGameOver()){
-                System.out.println("Game over");
-                break;
-            }
-        }
-
+        gameController.startGame();
 
     }
 }
