@@ -25,18 +25,22 @@ public class Computer {
         }
     }
 
-    public void makeShot(){
+    public boolean makeShot(){
+        System.out.println("Computer's move.");
+        boolean shotResult = false;
         if(!secondShotStarted & !nextShotStarted){
-            firstShot();
+            shotResult = firstShot();
         }else if(secondShotStarted){
-            secondShot(lastCoordinate);
+            shotResult = secondShot(lastCoordinate);
         }else if(nextShotStarted){
-            nextShot(lastCoordinate);
+            shotResult = nextShot(lastCoordinate);
         }
+
+        return shotResult;
     }
 
-    private void firstShot(){
-        System.out.println("First shot");
+    private boolean firstShot(){
+//        System.out.println("First shot");
 
         currentShipCoordinates.clear();
 
@@ -57,10 +61,12 @@ public class Computer {
         }else if (shotResult & field.isShipDead(coordinate)){   // Если выстрел удачный и корабль убит
             removeShipEdgesCoordinatesFromAvailableCoordinates(coordinate);
         }
+
+        return shotResult;
     }
 
-    private void secondShot(Coordinate coordinate){
-        System.out.println("Second shot!"); /**DEBUG*/
+    private boolean secondShot(Coordinate coordinate){
+//        System.out.println("Second shot!"); /**DEBUG*/
 
         if (secondShotFirstTime){
             secondShotFirstTime = false;
@@ -77,9 +83,9 @@ public class Computer {
 //            }
         }
 
-        System.out.println("secondShotStarted = " + secondShotStarted); /**DEBUG*/
-        System.out.println("Initial coordinate: " + coordinate); /**DEBUG*/
-        System.out.println("Possible coordinates: " + possibleCoordinatesForShot); /**DEBUG*/
+//        System.out.println("secondShotStarted = " + secondShotStarted); /**DEBUG*/
+//        System.out.println("Initial coordinate: " + coordinate); /**DEBUG*/
+//        System.out.println("Possible coordinates: " + possibleCoordinatesForShot); /**DEBUG*/
 
         Coordinate randomPossibleCoordinate = possibleCoordinatesForShot.get(0);
         System.out.println("Computer shot: " + randomPossibleCoordinate);
@@ -93,23 +99,24 @@ public class Computer {
             secondShotStarted = false;
             possibleCoordinatesForShot.clear();
         }else if(shotResult & !field.isShipDead(randomPossibleCoordinate)){ // Еслм выстрел удачный и корабль ещё жив
-            System.out.println("Hit + alive!");
+//            System.out.println("Hit + alive!"); /**DEBUG*/
             currentShipCoordinates.add(randomPossibleCoordinate);
             lastCoordinate = coordinate;
             secondShotStarted = false;
             nextShotStarted = true;
 //            nextShot(randomPossibleCoordinate);
         }else if(!shotResult){                                              // Если промах
-            System.out.println("Miss + alive!");
+//            System.out.println("Miss + alive!"); /**DEBUG*/
             lastCoordinate = coordinate;
 //            secondShot(coordinate);
         }
 
+        return shotResult;
     }
 
-    private void nextShot(Coordinate coordinate){
+    private boolean nextShot(Coordinate coordinate){
+        //        System.out.println("Next shot!"); /**DEBUG*/
         lastCoordinate = null;
-        System.out.println("Next shot!"); /**DEBUG*/
         possibleCoordinatesForShot.clear();
         String shipOrientation = field.getShipOrientation(coordinate);
 
@@ -122,7 +129,7 @@ public class Computer {
             possibleCoordinatesForShot.add(field.getCoordinateObject(currentShipCoordinates.last().getX()+1, currentShipCoordinates.last().getY()));
         }
         checkPossibleCoordinates(possibleCoordinatesForShot);
-        System.out.println("Possible coordinates: " + possibleCoordinatesForShot); /**DEBUG*/
+//        System.out.println("Possible coordinates: " + possibleCoordinatesForShot); /**DEBUG*/
         Coordinate randomPossibleCoordinate = possibleCoordinatesForShot.get(random.nextInt(possibleCoordinatesForShot.size())); // TODO: вынести randomPossibleCoordinate в класс
         System.out.println("Computer shot: " + randomPossibleCoordinate);
         availableCoordinates.remove(randomPossibleCoordinate);
@@ -140,6 +147,8 @@ public class Computer {
             lastCoordinate = coordinate;
 //            nextShot(coordinate);
         }
+
+        return shotResult;
     }
 
     // Проверка набора возможных координат (не занята и валидна)
