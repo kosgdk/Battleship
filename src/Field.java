@@ -8,6 +8,7 @@ public class Field {
     private HashMap<Coordinate, Ship> shipsCoordinates = new HashMap<>();  // Координаты всех кораблей
     private HashMap<Coordinate, Ship> shipsEdgesCoordinates = new HashMap<>(); // Координаты прилегающих к кораблям ячеек
     private HashSet<Coordinate> dotsCoordinates = new HashSet<>();  // Координаты пустых ячеек, в которые стреляли
+    private HashSet<Coordinate> deadShipsCoordinates = new HashSet<>(); // Координаты подбитых кораблей
     private HashSet<Ship> ships = new HashSet<>();  // Корабли, установленные на поле
 
     private final String dotCell = " • ";   // Отображение пустой ячейки, в которую стреляли
@@ -97,8 +98,9 @@ public class Field {
     public boolean makeShot(Coordinate coordinate) {
 
         if(shipsCoordinates.containsKey(coordinate)){       // Если набор координат кораблей содержит текущую координату
-            Ship ship = shipsCoordinates.get(coordinate);
-            ship.gotShot(coordinate);                       // делаем выстрел
+            deadShipsCoordinates.add(coordinate);
+            Ship ship = shipsCoordinates.get(coordinate);   // Получаем корабль, находящийся по заданной координате
+            ship.gotShot(coordinate);                       // делаем выстрел по кораблю
             if(ship.isDead()){                              // Если корабль убит
                 System.out.println("Kill!");
                 for(Coordinate edgeCoordinate : ship.getEdgesCoordinates()){    // Помечаем прилегающие координаты точками
@@ -107,12 +109,10 @@ public class Field {
             }else {
                 System.out.println("Hit!");
             }
-            drawField();
             return true;
         }else{
             dotsCoordinates.add(coordinate);  // Если в текущей координате нет корабля - добавляем её в набор с координатами "точек".
             System.out.println("Miss!");
-            drawField();
             return false;
         }
 
@@ -120,7 +120,11 @@ public class Field {
 
     public void drawField() {
 
-//        System.out.println();
+        if (computerFieldType) {
+            System.out.println("Computer's field:");
+        }else {
+            System.out.println("Your field:");
+        }
 
         System.out.print("Y ");
 
@@ -209,6 +213,14 @@ public class Field {
             return ship.getOrientation();
         }
         return null;
+    }
+
+    public boolean wasShotBefore(Coordinate coordinate){
+        if (dotsCoordinates.contains(coordinate) || deadShipsCoordinates.contains(coordinate)){
+            return true;
+        } else {
+            return false;
+        }
     }
 
 }
